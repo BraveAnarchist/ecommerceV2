@@ -4,10 +4,8 @@ import "dotenv/config";
 
 async function authMiddleware(req, res, next) {
   try {
-    // const { tempToken } = req.cookies || req.body;
-    const { tempToken } = req.body;
-    // console.log(req.body);
-    // return;
+    const { tempToken } = req.cookies || req.body;
+    
 
     if (!tempToken) return res.status(200).json({ error: "Token not found" });
 
@@ -18,7 +16,7 @@ async function authMiddleware(req, res, next) {
     if (!loggedInUser) res.status(200).json({ error: "User not found" });
 
     req.user = loggedInUser;
-    // console.log(req.user);
+   
     next();
   } catch (err) {
     console.log(err);

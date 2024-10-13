@@ -55,7 +55,6 @@ export async function getAllProducts(req, res) {
       ">=": "$gte",
     };
 
-    // [=, <, >, <=, >=]
 
     Object.keys(priceOperators).forEach((operator) => {
       if (req.query.price.startsWith(operator)) {
@@ -67,7 +66,7 @@ export async function getAllProducts(req, res) {
   }
 
   if (req.query.name) {
-    query.name = { $regex: req.query.name, $options: "i" }; //i: case insensitivity
+    query.name = { $regex: req.query.name, $options: "i" }; 
   }
 
   const allProducts = await productModel.find(query).sort(sortArg);
@@ -84,7 +83,6 @@ export async function deleteProduct(req, res) {
   }
 }
 
-//FETCH A SINGLE PRODCUCT
 
 export async function getSingleProduct(req, res) {
   const idToFind = req.params.id;
@@ -99,14 +97,12 @@ export async function addToWishlist(req, res) {
 
   productID = new mongoose.Types.ObjectId(productID);
 
-  //GATHER ALL THE DATA FOR THIS USER
 
-  //CHECK WHETHER PRODUCT IS ALREADY ADDED
   const user = req.user;
 
   const existingProduct = user.wishlist.find((ids) => ids.equals(productID));
 
-  // console.log(existingProduct, productID);
+
 
   if (!existingProduct) {
     //push productID into wishlist
@@ -132,7 +128,7 @@ export async function rating(req, res) {
   let { starRating, comment, productID } = req.body;
   const userID = req.user._id;
 
-  // productID = new mongoose.Types.ObjectId(productID);
+
 
   try {
     //FIND THE PRODUCT BY ID
@@ -146,8 +142,7 @@ export async function rating(req, res) {
     let updatedProduct;
 
     if (alreadyRated) {
-      //IF ALREADY RATED:
-      // UPDATE THE RATING
+      
 
       updatedProduct = await productModel.findOneAndUpdate(
         {
@@ -163,8 +158,7 @@ export async function rating(req, res) {
         { new: true }
       );
     } else {
-      //IF IT'S A NEW RATING:
-      // ADD A NEW RATING
+     
 
       updatedProduct = await productModel.findByIdAndUpdate(
         productID,
@@ -181,22 +175,19 @@ export async function rating(req, res) {
       );
     }
 
-    // RECALCULATE TOTAL RATING
-
-    // GET TOTAL NUMBER OF RATINGS
     const totalRating = updatedProduct.ratings.length;
 
-    // GET THE SUM OF ALL STARS
+
     const ratingSum = updatedProduct.ratings.reduce((accumulator, current) => {
       return accumulator + current.star;
     }, 0);
 
-    // GET THE AVERAGE
+ 
     const actualRating = ratingSum / totalRating;
 
     console.log(totalRating, ratingSum, actualRating);
 
-    // UPDATE PRODUCT WITH NEW TOTAL RATING
+   
     const finalProduct = await productModel.findByIdAndUpdate(
       productID,
       { totalRating: actualRating.toFixed(2) },
